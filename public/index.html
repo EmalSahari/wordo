@@ -14,28 +14,15 @@
   </head>
   <body>
     <div id="app">
-      <!-- Join screen -->
+      <!-- Start screen -->
       <section id="join" class="screen">
         <h1 class="logo">Word<span class="o-dot">o</span></h1>
         <p class="tagline">Guess the secret word. Fewer guesses is better.</p>
         <form id="join-form" class="card">
-          <div class="mode-tabs" id="mode-tabs">
-            <button type="button" class="mode-tab active" data-mode="solo">🎯 Solo</button>
-            <button type="button" class="mode-tab" data-mode="daily">🗓️ Daily</button>
-            <button type="button" class="mode-tab" data-mode="multi">👥 Friends</button>
-          </div>
-          <label>
-            Your name
-            <input id="name" maxlength="20" placeholder="Anonymous" autocomplete="off" />
-          </label>
           <div class="lang-field">
             <span class="lang-label">Choose a language <span class="hint">(the words you'll guess)</span></span>
             <div id="lang-options" class="lang-options"></div>
           </div>
-          <label id="room-field" class="hidden">
-            Room code <span class="hint">(leave empty to create one)</span>
-            <input id="room" maxlength="4" placeholder="e.g. AB12" autocomplete="off" style="text-transform: uppercase" />
-          </label>
           <div class="row">
             <button type="submit" id="join-btn" class="primary" disabled>Play</button>
           </div>
@@ -47,16 +34,12 @@
       <section id="game" class="screen hidden">
         <header class="game-header">
           <span class="logo small">Word<span class="o-dot">o</span></span>
-          <span class="room-badge">Room <strong id="room-code"></strong></span>
-          <span class="round-badge">Round <strong id="round-num"></strong></span>
-          <span class="daily-badge hidden">🗓️ Daily challenge</span>
+          <span class="round-badge">Round <strong id="round-num">1</strong></span>
           <span class="count-badge">Guesses <strong id="guess-count">0</strong></span>
           <button id="sound-btn" class="ghost icon-btn" title="Sound on/off">🔊</button>
-          <button id="invite-btn" class="ghost hidden">🔗 Invite</button>
-          <button id="leave-btn" class="ghost">Leave</button>
+          <button id="leave-btn" class="ghost">Change language</button>
         </header>
 
-        <div id="conn-bar" class="conn-bar hidden"></div>
         <div id="win-banner" class="banner hidden"></div>
         <div id="toast" class="toast hidden" aria-live="polite"></div>
 
@@ -69,10 +52,9 @@
             <p id="guess-msg" class="guess-msg"></p>
 
             <div class="action-row">
-              <button id="hint-btn" class="ghost hint-btn hidden">💡 Hint</button>
+              <button id="hint-btn" class="ghost hint-btn hidden">💡 Get a hint</button>
               <button id="giveup-btn" class="ghost giveup-btn hidden">Give up</button>
             </div>
-            <div id="leaderboard" class="leaderboard hidden"></div>
             <button id="new-round" class="ghost full hidden">New game</button>
             <ul id="guesses" class="guesses"></ul>
           </main>
@@ -80,13 +62,6 @@
           <aside id="history">
             <h2 id="history-title">Your guesses</h2>
             <ul id="history-list" class="history-list"></ul>
-          </aside>
-
-          <aside id="sidebar">
-            <h2>Players</h2>
-            <ul id="scoreboard" class="scoreboard"></ul>
-            <h2>Activity</h2>
-            <ul id="feed" class="feed"></ul>
           </aside>
         </div>
       </section>
