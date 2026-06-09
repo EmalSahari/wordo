@@ -205,8 +205,8 @@ main { grid-area: main; }
 .closest { background: var(--bg-card); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; margin-bottom: 14px; }
 .closest-top { display: flex; align-items: baseline; gap: 9px; margin-bottom: 9px; }
 .closest-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-.closest-word { font-weight: 700; font-size: 16px; }
-.closest-rank { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 700; }
+.closest-temp { margin-left: auto; font-weight: 700; font-size: 17px; }
+.closest-sub { margin-top: 7px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .closest-meter { height: 8px; background: var(--bg-elev); border-radius: 999px; overflow: hidden; }
 .closest-fill { height: 100%; border-radius: 999px; width: 0; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s; }
 .closest.warmer { animation: warmerPulse 0.7s ease; }
