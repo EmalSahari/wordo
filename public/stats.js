@@ -4,34 +4,46 @@ const KEY = "wordo_stats_v1";
 
 // Achievements. test(g, s): g = the game just finished (result, guesses, hints,
 // lang, difficulty, sessionCount); s = derived stats over all games.
+// Ordered groups — related/tiered achievements share a group so they render in a row.
+export const GROUPS = [
+  { id: "solving", name: "Solving" },
+  { id: "speed", name: "Speed" },
+  { id: "streaks", name: "Streaks" },
+  { id: "nohint", name: "No hints" },
+  { id: "experience", name: "Experience" },
+  { id: "difficulty", name: "Difficulty" },
+  { id: "languages", name: "Languages" },
+  { id: "special", name: "Special" },
+];
+
 const ACHIEVEMENTS = [
-  { id: "first_win", icon: "🎉", name: "First solve", desc: "Win your first game", test: (g, s) => s.solved >= 1 },
-  { id: "wins_5", icon: "🌟", name: "Getting good", desc: "Solve 5 games", test: (g, s) => s.solved >= 5 },
-  { id: "wins_25", icon: "⭐", name: "Wordsmith", desc: "Solve 25 games", test: (g, s) => s.solved >= 25 },
-  { id: "wins_50", icon: "💫", name: "Veteran", desc: "Solve 50 games", test: (g, s) => s.solved >= 50 },
-  { id: "wins_100", icon: "👑", name: "Word master", desc: "Solve 100 games", test: (g, s) => s.solved >= 100 },
-  { id: "sharp_20", icon: "🎯", name: "On target", desc: "Solve in 20 guesses or fewer", test: (g) => g.result === "won" && g.guesses <= 20 },
-  { id: "sharp_10", icon: "🔥", name: "Sharp", desc: "Solve in 10 or fewer", test: (g) => g.result === "won" && g.guesses <= 10 },
-  { id: "sharp_5", icon: "⚡", name: "Razor sharp", desc: "Solve in 5 or fewer", test: (g) => g.result === "won" && g.guesses <= 5 },
-  { id: "sharp_3", icon: "🧨", name: "Genius", desc: "Solve in 3 or fewer", test: (g) => g.result === "won" && g.guesses <= 3 },
-  { id: "one_shot", icon: "🎰", name: "Hole in one", desc: "Solve on the very first guess", test: (g) => g.result === "won" && g.guesses === 1 },
-  { id: "no_hint", icon: "🧠", name: "No help needed", desc: "Win without using a hint", test: (g) => g.result === "won" && !g.hints },
-  { id: "no_hint_10", icon: "🦉", name: "Self-made", desc: "Win 10 games without hints", test: (g, s) => s.noHintWins >= 10 },
-  { id: "streak_3", icon: "🔗", name: "On a roll", desc: "Win 3 games in a row", test: (g, s) => s.winStreak >= 3 },
-  { id: "streak_5", icon: "💪", name: "Unstoppable", desc: "Win 5 in a row", test: (g, s) => s.winStreak >= 5 },
-  { id: "streak_10", icon: "🏆", name: "Relentless", desc: "Win 10 in a row", test: (g, s) => s.winStreak >= 10 },
-  { id: "games_10", icon: "🎮", name: "Warming up", desc: "Play 10 games", test: (g, s) => s.played >= 10 },
-  { id: "games_50", icon: "🕹️", name: "Dedicated", desc: "Play 50 games", test: (g, s) => s.played >= 50 },
-  { id: "games_100", icon: "🏅", name: "Centurion", desc: "Play 100 games", test: (g, s) => s.played >= 100 },
-  { id: "win_medium", icon: "🟠", name: "Stepping up", desc: "Win on Medium difficulty", test: (g) => g.result === "won" && g.difficulty === "medium" },
-  { id: "win_hard", icon: "🔴", name: "Brave", desc: "Win on Hard difficulty", test: (g) => g.result === "won" && g.difficulty === "hard" },
-  { id: "hard_sharp", icon: "💎", name: "Hardcore", desc: "Win on Hard in 15 or fewer", test: (g) => g.result === "won" && g.difficulty === "hard" && g.guesses <= 15 },
-  { id: "lang_da", icon: "🇩🇰", name: "Dansk", desc: "Solve a Danish word", test: (g) => g.result === "won" && g.lang === "da" },
-  { id: "lang_en", icon: "🇬🇧", name: "English", desc: "Solve an English word", test: (g) => g.result === "won" && g.lang === "en" },
-  { id: "bilingual", icon: "🌍", name: "Bilingual", desc: "Solve a word in both languages", test: (g, s) => s.langsWon.has("da") && s.langsWon.has("en") },
-  { id: "comeback", icon: "🔄", name: "Comeback", desc: "Win right after giving up", test: (g, s) => g.result === "won" && s.prevResult === "gaveup" },
-  { id: "marathon", icon: "🏃", name: "Marathon", desc: "Play 5 games in one sitting", test: (g) => (g.sessionCount || 0) >= 5 },
-  { id: "explorer", icon: "🧭", name: "Explorer", desc: "Try all three difficulties", test: (g, s) => s.difficultiesPlayed.size >= 3 },
+  { id: "first_win", group: "solving", icon: "🎉", name: "First solve", desc: "Win your first game", test: (g, s) => s.solved >= 1 },
+  { id: "wins_5", group: "solving", icon: "🌟", name: "Getting good", desc: "Solve 5 games", test: (g, s) => s.solved >= 5 },
+  { id: "wins_25", group: "solving", icon: "⭐", name: "Wordsmith", desc: "Solve 25 games", test: (g, s) => s.solved >= 25 },
+  { id: "wins_50", group: "solving", icon: "💫", name: "Veteran", desc: "Solve 50 games", test: (g, s) => s.solved >= 50 },
+  { id: "wins_100", group: "solving", icon: "👑", name: "Word master", desc: "Solve 100 games", test: (g, s) => s.solved >= 100 },
+  { id: "sharp_20", group: "speed", icon: "🎯", name: "On target", desc: "Solve in 20 or fewer", test: (g) => g.result === "won" && g.guesses <= 20 },
+  { id: "sharp_10", group: "speed", icon: "🔥", name: "Sharp", desc: "Solve in 10 or fewer", test: (g) => g.result === "won" && g.guesses <= 10 },
+  { id: "sharp_5", group: "speed", icon: "⚡", name: "Razor sharp", desc: "Solve in 5 or fewer", test: (g) => g.result === "won" && g.guesses <= 5 },
+  { id: "sharp_3", group: "speed", icon: "🧨", name: "Genius", desc: "Solve in 3 or fewer", test: (g) => g.result === "won" && g.guesses <= 3 },
+  { id: "one_shot", group: "speed", icon: "🎰", name: "Hole in one", desc: "Solve on the first guess", test: (g) => g.result === "won" && g.guesses === 1 },
+  { id: "streak_3", group: "streaks", icon: "🔗", name: "On a roll", desc: "Win 3 in a row", test: (g, s) => s.winStreak >= 3 },
+  { id: "streak_5", group: "streaks", icon: "💪", name: "Unstoppable", desc: "Win 5 in a row", test: (g, s) => s.winStreak >= 5 },
+  { id: "streak_10", group: "streaks", icon: "🏆", name: "Relentless", desc: "Win 10 in a row", test: (g, s) => s.winStreak >= 10 },
+  { id: "no_hint", group: "nohint", icon: "🧠", name: "No help needed", desc: "Win without a hint", test: (g) => g.result === "won" && !g.hints },
+  { id: "no_hint_10", group: "nohint", icon: "🦉", name: "Self-made", desc: "Win 10 without hints", test: (g, s) => s.noHintWins >= 10 },
+  { id: "games_10", group: "experience", icon: "🎮", name: "Warming up", desc: "Play 10 games", test: (g, s) => s.played >= 10 },
+  { id: "games_50", group: "experience", icon: "🕹️", name: "Dedicated", desc: "Play 50 games", test: (g, s) => s.played >= 50 },
+  { id: "games_100", group: "experience", icon: "🏅", name: "Centurion", desc: "Play 100 games", test: (g, s) => s.played >= 100 },
+  { id: "win_medium", group: "difficulty", icon: "🟠", name: "Stepping up", desc: "Win on Medium", test: (g) => g.result === "won" && g.difficulty === "medium" },
+  { id: "win_hard", group: "difficulty", icon: "🔴", name: "Brave", desc: "Win on Hard", test: (g) => g.result === "won" && g.difficulty === "hard" },
+  { id: "hard_sharp", group: "difficulty", icon: "💎", name: "Hardcore", desc: "Win Hard in 15 or fewer", test: (g) => g.result === "won" && g.difficulty === "hard" && g.guesses <= 15 },
+  { id: "lang_da", group: "languages", icon: "🇩🇰", name: "Dansk", desc: "Solve a Danish word", test: (g) => g.result === "won" && g.lang === "da" },
+  { id: "lang_en", group: "languages", icon: "🇬🇧", name: "English", desc: "Solve an English word", test: (g) => g.result === "won" && g.lang === "en" },
+  { id: "bilingual", group: "languages", icon: "🌍", name: "Bilingual", desc: "Solve in both languages", test: (g, s) => s.langsWon.has("da") && s.langsWon.has("en") },
+  { id: "comeback", group: "special", icon: "🔄", name: "Comeback", desc: "Win right after giving up", test: (g, s) => g.result === "won" && s.prevResult === "gaveup" },
+  { id: "marathon", group: "special", icon: "🏃", name: "Marathon", desc: "Play 5 in one sitting", test: (g) => (g.sessionCount || 0) >= 5 },
+  { id: "explorer", group: "special", icon: "🧭", name: "Explorer", desc: "Try all three difficulties", test: (g, s) => s.difficultiesPlayed.size >= 3 },
 ];
 
 const RANKS = [
@@ -130,5 +142,5 @@ export function recordGame(g) {
 }
 
 export function achievements() {
-  return ACHIEVEMENTS.map((a) => ({ id: a.id, icon: a.icon, name: a.name, desc: a.desc, earned: !!data.achievements[a.id] }));
+  return ACHIEVEMENTS.map((a) => ({ id: a.id, group: a.group, icon: a.icon, name: a.name, desc: a.desc, earned: !!data.achievements[a.id] }));
 }
