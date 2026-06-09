@@ -208,13 +208,23 @@ function showWin(word, count) {
   finishGame("won", count);
 }
 
-// Persist the finished game, refresh stats, celebrate any new achievements.
+// Persist the finished game, refresh stats, celebrate new achievements / rank-ups.
 function finishGame(result, guesses) {
-  const { newlyEarned } = stats.recordGame({ result, guesses, hints: hintsUsed });
+  const { newlyEarned, rankUp } = stats.recordGame({
+    result,
+    guesses,
+    hints: hintsUsed,
+    lang,
+    difficulty: selectedDifficulty,
+    sessionCount: round,
+  });
   renderStats();
-  if (newlyEarned.length) {
-    newlyEarned.forEach((a, i) => setTimeout(() => showAchievementToast(a), 700 + i * 1400));
+  let delay = 800;
+  for (const a of newlyEarned) {
+    setTimeout(() => showAchievementToast(a), delay);
+    delay += 1500;
   }
+  if (rankUp) setTimeout(() => showRankUpToast(rankUp), delay);
 }
 
 // ---- Persistent stats (right column, #7) ---------------------------------
@@ -254,25 +264,69 @@ function renderStats() {
     }
   }
 
-  const ach = $("achievements");
-  ach.innerHTML = "";
-  for (const item of stats.achievements()) {
-    const el = document.createElement("div");
-    el.className = "ach" + (item.earned ? " earned" : "");
-    el.title = item.name;
-    el.innerHTML = `<span class="ach-icon">${item.icon}</span><span class="ach-name">${item.name}</span>`;
-    ach.appendChild(el);
+  // Rank card
+  const r = a.rank;
+  let html = `<div class="rank-top"><span class="rank-name" style="color:${r.color}">${r.icon} ${r.name}</span><span class="rank-count">${a.earnedCount}/${a.total}</span></div>`;
+  if (r.next) {
+    const span = r.next.to - r.next.from;
+    const prog = span > 0 ? ((a.earnedCount - r.next.from) / span) * 100 : 0;
+    html += `<div class="rank-bar"><div class="rank-fill" style="width:${prog}%;background:${r.color}"></div></div>`;
+    html += `<div class="rank-sub">${r.next.needed} more to ${r.next.name}</div>`;
+  } else {
+    html += `<div class="rank-bar"><div class="rank-fill" style="width:100%;background:${r.color}"></div></div>`;
+    html += `<div class="rank-sub">Top rank reached 🎉</div>`;
   }
+  html += `<button type="button" id="ach-btn" class="ghost full">View achievements (${a.earnedCount}/${a.total})</button>`;
+  $("rank-card").innerHTML = html;
+  $("ach-btn").onclick = openAchModal;
 }
+
+// ---- Achievements modal --------------------------------------------------
+function openAchModal() {
+  const list = stats.achievements();
+  const earned = list.filter((a) => a.earned).length;
+  $("ach-modal-title").textContent = `Achievements (${earned}/${list.length})`;
+  const grid = $("ach-grid");
+  grid.innerHTML = "";
+  for (const a of list) {
+    const el = document.createElement("div");
+    el.className = "ach" + (a.earned ? " earned" : "");
+    el.innerHTML =
+      `<span class="ach-icon">${a.earned ? a.icon : "🔒"}</span>` +
+      `<span class="ach-text"><span class="ach-name">${a.name}</span><span class="ach-desc">${esc(a.desc)}</span></span>`;
+    grid.appendChild(el);
+  }
+  $("ach-modal").classList.remove("hidden");
+}
+$("ach-close").addEventListener("click", () => $("ach-modal").classList.add("hidden"));
+$("ach-modal").addEventListener("click", (e) => {
+  if (e.target === $("ach-modal")) $("ach-modal").classList.add("hidden");
+});
 
 function showAchievementToast(a) {
   const el = $("toast");
-  el.innerHTML = `<span class="t-word">${a.icon} ${a.name}</span><span class="t-rank">unlocked</span>`;
+  el.innerHTML = `<span class="t-word">${a.icon} ${esc(a.name)}</span><span class="t-rank">unlocked</span>`;
   el.style.borderColor = "var(--accent)";
   el.classList.remove("hidden", "show");
   void el.offsetWidth;
   el.classList.add("show");
   sfx.playClick();
+}
+
+function showRankUpToast(r) {
+  const el = $("toast");
+  el.innerHTML = `<span class="t-word">${r.icon} ${r.name} rank!</span><span class="t-rank" style="color:${r.color}">level up</span>`;
+  el.style.borderColor = r.color;
+  el.classList.remove("hidden", "show");
+  void el.offsetWidth;
+  el.classList.add("show");
+  sfx.playWin();
+}
+
+function esc(s) {
+  const d = document.createElement("div");
+  d.textContent = s;
+  return d.innerHTML;
 }
 
 function updateCounts() {
