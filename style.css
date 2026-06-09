@@ -258,6 +258,15 @@ main { grid-area: main; }
 .history-empty { color: var(--muted); font-size: 13px; padding: 4px 2px; }
 .daily-badge { color: var(--accent); font-size: 14px; font-weight: 600; }
 
+/* Daily mode */
+.mode-note { color: var(--muted); font-size: 13px; margin: -4px 0 0; }
+.daily-result {
+  background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 16px; margin-bottom: 14px; text-align: center;
+}
+.daily-streak { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
+.daily-come-back { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
+
 /* Daily leaderboard panel */
 .leaderboard {
   background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius);
