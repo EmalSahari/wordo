@@ -287,7 +287,16 @@ function updateCounts() {
   $("history-title").textContent = guesses.length ? `Your guesses (${guesses.length})` : "Your guesses";
 }
 
-// ---- Closest-guess warmth meter (#3) -------------------------------------
+// ---- Warmth gauge (#3): a temperature reading of your best guess ----------
+function tempLabel(rank) {
+  if (rank === 1) return "Solved! 🎉";
+  if (rank <= 30) return "Boiling 🔥";
+  if (rank <= 150) return "Hot 🥵";
+  if (rank <= 600) return "Warm 🙂";
+  if (rank <= 2500) return "Cool 😐";
+  if (rank <= 8000) return "Cold 🥶";
+  return "Freezing ❄️";
+}
 function renderClosest(improved) {
   if (!guesses.length) {
     $("closest").classList.add("hidden");
@@ -296,9 +305,9 @@ function renderClosest(improved) {
   const best = guesses.reduce((a, b) => (b.rank < a.rank ? b : a));
   const color = rankColor(best.rank);
   $("closest").classList.remove("hidden");
-  $("closest-word").textContent = (best.hint ? "💡 " : "") + best.word;
-  $("closest-rank").textContent = `${fmt(best.rank)} ${rankEmoji(best.rank)}`;
-  $("closest-rank").style.color = color;
+  $("closest-temp").textContent = tempLabel(best.rank);
+  $("closest-temp").style.color = color;
+  $("closest-sub").textContent = `best: ${best.hint ? "💡 " : ""}${best.word} · rank ${fmt(best.rank)}`;
   const fill = $("closest-fill");
   fill.style.width = 100 - warmth(best.rank) * 100 + "%";
   fill.style.background = color;
