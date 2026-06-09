@@ -24,7 +24,6 @@ let maxRank = 25000;
 let rowEls = new Map();
 let selectedLang = null;
 let selectedDifficulty = "easy";
-let bestRank = Infinity; // warmest guess this round (for the closest meter)
 
 // Difficulty buttons
 for (const btn of document.querySelectorAll(".diff-btn")) {
@@ -96,13 +95,11 @@ function newRound() {
   guesses = [];
   roundEnded = false;
   hintsUsed = 0;
-  bestRank = Infinity;
   rowEls = new Map();
   round += 1;
   $("round-num").textContent = round;
   $("guesses").innerHTML = "";
   $("history-list").innerHTML = `<li class="history-empty">No guesses yet</li>`;
-  $("closest").classList.add("hidden");
   $("win-banner").classList.add("hidden");
   $("new-round").classList.add("hidden");
   $("guess-msg").textContent = "";
@@ -150,11 +147,8 @@ function submitGuess(word, isHint = false) {
   guesses.push(g);
   if (isHint) hintsUsed += 1;
 
-  const improved = g.rank < bestRank;
-  if (improved) bestRank = g.rank;
   renderGuesses(g);
   renderHistory(g.word);
-  renderClosest(improved);
   updateCounts();
   updateHintBtn();
 
@@ -199,7 +193,6 @@ $("giveup-btn").addEventListener("click", async () => {
   banner.textContent = `You gave up. The word was "${secret}".`;
   banner.classList.remove("hidden");
   $("new-round").classList.remove("hidden");
-  $("closest").classList.add("hidden");
   finishGame("gaveup", guesses.length);
 });
 
@@ -285,38 +278,6 @@ function showAchievementToast(a) {
 function updateCounts() {
   $("guess-count").textContent = guesses.length;
   $("history-title").textContent = guesses.length ? `Your guesses (${guesses.length})` : "Your guesses";
-}
-
-// ---- Warmth gauge (#3): a temperature reading of your best guess ----------
-function tempLabel(rank) {
-  if (rank === 1) return "Solved! 🎉";
-  if (rank <= 30) return "Boiling 🔥";
-  if (rank <= 150) return "Hot 🥵";
-  if (rank <= 600) return "Warm 🙂";
-  if (rank <= 2500) return "Cool 😐";
-  if (rank <= 8000) return "Cold 🥶";
-  return "Freezing ❄️";
-}
-function renderClosest(improved) {
-  if (!guesses.length) {
-    $("closest").classList.add("hidden");
-    return;
-  }
-  const best = guesses.reduce((a, b) => (b.rank < a.rank ? b : a));
-  const color = rankColor(best.rank);
-  $("closest").classList.remove("hidden");
-  $("closest-temp").textContent = tempLabel(best.rank);
-  $("closest-temp").style.color = color;
-  $("closest-sub").textContent = `best: ${best.hint ? "💡 " : ""}${best.word} · rank ${fmt(best.rank)}`;
-  const fill = $("closest-fill");
-  fill.style.width = 100 - warmth(best.rank) * 100 + "%";
-  fill.style.background = color;
-  if (improved) {
-    const c = $("closest");
-    c.classList.remove("warmer");
-    void c.offsetWidth;
-    c.classList.add("warmer");
-  }
 }
 
 // ---- Warmth colours ------------------------------------------------------

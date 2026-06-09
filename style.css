@@ -201,20 +201,6 @@ main { grid-area: main; }
 .diff-btn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .diff-btn:not(.active):hover { border-color: var(--accent); }
 
-/* Closest-guess warmth meter (#3) */
-.closest { background: var(--bg-card); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; margin-bottom: 14px; }
-.closest-top { display: flex; align-items: baseline; gap: 9px; margin-bottom: 9px; }
-.closest-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
-.closest-temp { margin-left: auto; font-weight: 700; font-size: 17px; }
-.closest-sub { margin-top: 7px; font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.closest-meter { height: 8px; background: var(--bg-elev); border-radius: 999px; overflow: hidden; }
-.closest-fill { height: 100%; border-radius: 999px; width: 0; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s; }
-.closest.warmer { animation: warmerPulse 0.7s ease; }
-@keyframes warmerPulse {
-  0% { box-shadow: 0 0 0 0 rgba(240, 162, 58, 0.5); }
-  100% { box-shadow: 0 0 0 9px rgba(240, 162, 58, 0); }
-}
-
 /* Achievements (#7) */
 .achievements { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
 .ach { background: var(--bg-card); border-radius: 10px; padding: 10px 5px; text-align: center; opacity: 0.32; transition: opacity 0.3s; }
