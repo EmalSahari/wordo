@@ -201,13 +201,28 @@ main { grid-area: main; }
 .diff-btn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
 .diff-btn:not(.active):hover { border-color: var(--accent); }
 
-/* Achievements (#7) */
-.achievements { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
-.ach { background: var(--bg-card); border-radius: 10px; padding: 10px 5px; text-align: center; opacity: 0.32; transition: opacity 0.3s; }
-.ach.earned { opacity: 1; background: var(--bg-elev); }
-.ach-icon { font-size: 20px; display: block; filter: grayscale(1); }
+/* Rank card (#7) */
+.rank-card { background: var(--bg-card); border-radius: 10px; padding: 14px; }
+.rank-top { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+.rank-name { font-weight: 700; font-size: 18px; }
+.rank-count { color: var(--muted); font-size: 13px; font-variant-numeric: tabular-nums; }
+.rank-bar { height: 8px; background: var(--bg-elev); border-radius: 999px; overflow: hidden; }
+.rank-fill { height: 100%; border-radius: 999px; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.rank-sub { color: var(--muted); font-size: 12px; margin: 8px 0 12px; }
+
+/* Achievements modal */
+.ach-modal-box { max-width: 540px; max-height: 82vh; overflow-y: auto; }
+.ach-modal-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.ach-modal-head h3 { margin: 0; font-size: 18px; }
+.ach-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; }
+@media (max-width: 520px) { .ach-grid { grid-template-columns: 1fr; } }
+.ach { display: flex; align-items: flex-start; gap: 10px; background: var(--bg-elev); border: 1px solid transparent; border-radius: 10px; padding: 11px 12px; opacity: 0.55; }
+.ach.earned { opacity: 1; border-color: var(--line); }
+.ach-icon { font-size: 22px; line-height: 1.1; filter: grayscale(1); }
 .ach.earned .ach-icon { filter: none; }
-.ach-name { font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.2; }
+.ach-text { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.ach-name { font-weight: 700; font-size: 13px; }
+.ach-desc { font-size: 12px; color: var(--muted); line-height: 1.25; }
 
 /* Mobile polish (#6) */
 @media (max-width: 600px) {
