@@ -1,0 +1,21 @@
+# Render Blueprint — deploy Wordo with one click from your Git repo.
+# In Render: New → Blueprint → pick this repo. (A persistent disk needs a paid
+# plan; on the free plan drop the `disk` block — the leaderboard then resets on
+# redeploys, and the service sleeps when idle.)
+services:
+  - type: web
+    name: wordo
+    runtime: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: npm start
+    healthCheckPath: /health
+    envVars:
+      - key: TZ
+        value: Europe/Copenhagen
+      - key: WORDO_LEADERBOARD
+        value: /var/data/leaderboard.json
+    disk:
+      name: wordo-data
+      mountPath: /var/data
+      sizeGB: 1

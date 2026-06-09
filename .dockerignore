@@ -1,0 +1,7 @@
+node_modules
+pipeline/.venv
+.git
+.DS_Store
+*.log
+data/leaderboard.json
+.claude

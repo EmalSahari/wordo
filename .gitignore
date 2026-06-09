@@ -1,0 +1,5 @@
+node_modules/
+pipeline/.venv/
+.DS_Store
+*.log
+data/leaderboard.json
