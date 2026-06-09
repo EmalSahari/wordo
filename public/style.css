@@ -163,18 +163,35 @@ button:active { transform: translateY(1px); }
 
 .game-grid {
   display: grid; gap: 24px;
-  grid-template-columns: 200px 1fr;
-  grid-template-areas: "history main";
-  max-width: 880px;
+  grid-template-columns: 190px 1fr 230px;
+  grid-template-areas: "history main stats";
 }
 main { grid-area: main; }
+#stats { grid-area: stats; align-self: start; position: sticky; top: 16px; }
+@media (max-width: 900px) {
+  .game-grid { grid-template-columns: 190px 1fr; grid-template-areas: "history main" "stats stats"; }
+  #stats { position: static; }
+}
 @media (max-width: 760px) {
-  .game-grid {
-    grid-template-columns: 1fr;
-    grid-template-areas: "main" "history";
-  }
+  .game-grid { grid-template-columns: 1fr; grid-template-areas: "main" "stats" "history"; }
   #history { position: static; max-height: none; }
 }
+
+/* Session stats */
+.stats-summary { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 18px; }
+.stat { background: var(--bg-card); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 2px; }
+.stat-val { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.5px; }
+.stat-lbl { font-size: 12px; color: var(--muted); }
+.stats-empty { color: var(--muted); font-size: 13px; }
+.stats-chart-title { font-size: 12px; color: var(--muted); margin-bottom: 8px; }
+.stats-chart { display: flex; align-items: flex-end; gap: 5px; height: 120px; }
+.chart-col { flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: flex-end; height: 100%; }
+.chart-bar { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; transition: height 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
+.chart-bar.good { background: hsl(140, 60%, 48%); }
+.chart-bar.ok { background: var(--accent); }
+.chart-bar.far { background: hsl(215, 55%, 55%); }
+.chart-bar.gaveup { background: var(--error); opacity: 0.7; }
+.chart-num { text-align: center; font-size: 11px; color: var(--muted); margin-top: 5px; font-variant-numeric: tabular-nums; }
 
 /* Solo mode: drop the multiplayer scoreboard/feed (keep the history column) */
 #game.solo .game-grid { grid-template-columns: 200px 1fr; grid-template-areas: "history main"; max-width: 880px; }

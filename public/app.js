@@ -22,6 +22,7 @@ let hintsUsed = 0;
 let maxRank = 25000;
 let rowEls = new Map();
 let selectedLang = null;
+let sessionGames = []; // { result: 'won'|'gaveup', guesses }
 
 // ---- Language picker (required choice) -----------------------------------
 const langBox = $("lang-options");
@@ -65,6 +66,7 @@ $("join-form").addEventListener("submit", async (e) => {
   round = 0;
   $("join").classList.add("hidden");
   $("game").classList.remove("hidden");
+  renderStats();
   newRound();
 });
 
@@ -182,6 +184,8 @@ $("giveup-btn").addEventListener("click", async () => {
   banner.textContent = `You gave up. The word was "${secret}".`;
   banner.classList.remove("hidden");
   $("new-round").classList.remove("hidden");
+  sessionGames.push({ result: "gaveup", guesses: guesses.length });
+  renderStats();
 });
 
 function showWin(word, count) {
@@ -193,6 +197,50 @@ function showWin(word, count) {
   $("hint-btn").classList.add("hidden");
   $("giveup-btn").classList.add("hidden");
   $("new-round").classList.remove("hidden");
+  sessionGames.push({ result: "won", guesses: count });
+  renderStats();
+}
+
+// ---- Session stats (right column) ----------------------------------------
+function perfClass(g) {
+  return g <= 15 ? "good" : g <= 40 ? "ok" : "far";
+}
+function renderStats() {
+  const summary = $("stats-summary");
+  const chart = $("stats-chart");
+  const played = sessionGames.length;
+  if (!played) {
+    summary.innerHTML = `<div class="stats-empty">Finish a game to see your stats.</div>`;
+    chart.innerHTML = "";
+    return;
+  }
+  const wins = sessionGames.filter((g) => g.result === "won");
+  const vals = wins.map((g) => g.guesses);
+  const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
+  const best = vals.length ? Math.min(...vals) : null;
+
+  summary.innerHTML = `
+    <div class="stat"><span class="stat-val">${played}</span><span class="stat-lbl">Played</span></div>
+    <div class="stat"><span class="stat-val">${wins.length}</span><span class="stat-lbl">Solved</span></div>
+    <div class="stat"><span class="stat-val">${vals.length ? avg.toFixed(1) : "–"}</span><span class="stat-lbl">Avg guesses</span></div>
+    <div class="stat"><span class="stat-val">${best ?? "–"}</span><span class="stat-lbl">Best</span></div>`;
+
+  const recent = sessionGames.slice(-12);
+  const maxG = Math.max(1, ...recent.filter((g) => g.result === "won").map((g) => g.guesses));
+  chart.innerHTML = "";
+  for (const g of recent) {
+    const col = document.createElement("div");
+    col.className = "chart-col";
+    const bar = document.createElement("div");
+    bar.className = "chart-bar " + (g.result === "won" ? perfClass(g.guesses) : "gaveup");
+    bar.style.height = (g.result === "won" ? Math.max(8, (g.guesses / maxG) * 100) : 100) + "%";
+    bar.title = g.result === "won" ? `${g.guesses} guesses` : "gave up";
+    const num = document.createElement("div");
+    num.className = "chart-num";
+    num.textContent = g.result === "won" ? g.guesses : "✗";
+    col.append(bar, num);
+    chart.appendChild(col);
+  }
 }
 
 function updateCounts() {
