@@ -10,7 +10,7 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=8" />
+    <link rel="stylesheet" href="style.css?v=9" />
   </head>
   <body>
     <div id="app">
@@ -19,11 +19,16 @@
         <h1 class="logo">Word<span class="o-dot">o</span></h1>
         <p class="tagline">Guess the secret word. Fewer guesses is better.</p>
         <form id="join-form" class="card">
+          <div class="mode-tabs" id="mode-tabs">
+            <button type="button" class="mode-tab active" data-mode="daily">🗓️ Daily</button>
+            <button type="button" class="mode-tab" data-mode="solo">🎮 Solo</button>
+          </div>
+          <p id="mode-note" class="mode-note">One shared word for everyone today. Keep your streak going.</p>
           <div class="lang-field">
             <span class="lang-label">Choose a language <span class="hint">(the words you'll guess)</span></span>
             <div id="lang-options" class="lang-options"></div>
           </div>
-          <div class="lang-field">
+          <div class="lang-field hidden" id="diff-field">
             <span class="lang-label">Difficulty</span>
             <div id="diff-options" class="lang-options">
               <button type="button" class="diff-btn active" data-diff="easy">Easy</button>
@@ -43,6 +48,7 @@
         <header class="game-header">
           <span class="logo small">Word<span class="o-dot">o</span></span>
           <span class="round-badge">Round <strong id="round-num">1</strong></span>
+          <span class="daily-badge hidden" id="daily-badge">🗓️ Daily</span>
           <span class="count-badge">Guesses <strong id="guess-count">0</strong></span>
           <button id="sound-btn" class="ghost icon-btn" title="Sound on/off">🔊</button>
           <button id="leave-btn" class="ghost">Change language</button>
@@ -64,6 +70,11 @@
               <button id="giveup-btn" class="ghost giveup-btn hidden">Give up</button>
             </div>
             <button id="new-round" class="ghost full hidden">New game</button>
+            <div id="daily-result" class="daily-result hidden">
+              <div id="daily-streak" class="daily-streak"></div>
+              <button type="button" id="share-btn" class="primary full">🔗 Share result</button>
+              <p class="daily-come-back">Come back tomorrow for a new word.</p>
+            </div>
             <ul id="guesses" class="guesses"></ul>
           </main>
 
@@ -103,6 +114,6 @@
         <div id="ach-grid" class="ach-grid"></div>
       </div>
     </div>
-    <script src="app.js?v=8" type="module"></script>
+    <script src="app.js?v=9" type="module"></script>
   </body>
 </html>

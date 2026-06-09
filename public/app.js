@@ -1,9 +1,10 @@
 // Wordo — singleplayer, fully client-side. Scoring runs in the browser (engine.js);
 // no server, no network calls during play.
 
-import * as eng from "./engine.js?v=8";
-import * as sfx from "./sound.js?v=8";
-import * as stats from "./stats.js?v=8";
+import * as eng from "./engine.js?v=9";
+import * as sfx from "./sound.js?v=9";
+import * as stats from "./stats.js?v=9";
+import * as daily from "./daily.js?v=9";
 
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => n.toLocaleString("en-US");
@@ -24,6 +25,21 @@ let maxRank = 25000;
 let rowEls = new Map();
 let selectedLang = null;
 let selectedDifficulty = "easy";
+let mode = "daily"; // chosen on the start screen: "daily" | "solo"
+let isDailyGame = false; // the current game is the daily challenge
+
+// Mode tabs (Daily / Solo)
+for (const tab of document.querySelectorAll(".mode-tab")) {
+  tab.addEventListener("click", () => {
+    mode = tab.dataset.mode;
+    document.querySelectorAll(".mode-tab").forEach((t) => t.classList.toggle("active", t === tab));
+    $("diff-field").classList.toggle("hidden", mode !== "solo"); // difficulty only for solo
+    $("mode-note").textContent =
+      mode === "daily"
+        ? "One shared word for everyone today. Keep your streak going."
+        : "Unlimited practice with a random word. Pick a difficulty.";
+  });
+}
 
 // Difficulty buttons
 for (const btn of document.querySelectorAll(".diff-btn")) {
@@ -75,8 +91,17 @@ $("join-form").addEventListener("submit", async (e) => {
   round = 0;
   $("join").classList.add("hidden");
   $("game").classList.remove("hidden");
+  $("game").classList.toggle("daily", mode === "daily");
+  $("daily-badge").classList.toggle("hidden", mode !== "daily");
   renderStats();
-  newRound();
+
+  if (mode === "daily") {
+    const d = daily.getDaily(lang);
+    if (d.played) showDailyDone(d);
+    else startDaily();
+  } else {
+    newRound();
+  }
 });
 
 $("sound-btn").textContent = sfx.soundEnabled() ? "🔊" : "🔇";
@@ -90,18 +115,18 @@ $("sound-btn").addEventListener("click", () => {
 $("leave-btn").addEventListener("click", () => location.reload());
 
 // ---- Round lifecycle -----------------------------------------------------
-function newRound() {
-  secret = eng.randomSecret(lang, selectedDifficulty);
+function resetRoundUI() {
   guesses = [];
   roundEnded = false;
   hintsUsed = 0;
   rowEls = new Map();
-  round += 1;
-  $("round-num").textContent = round;
   $("guesses").innerHTML = "";
+  $("guesses").classList.remove("hidden");
+  $("history").classList.remove("hidden");
   $("history-list").innerHTML = `<li class="history-empty">No guesses yet</li>`;
   $("win-banner").classList.add("hidden");
   $("new-round").classList.add("hidden");
+  $("daily-result").classList.add("hidden");
   $("guess-msg").textContent = "";
   $("guess-form").classList.remove("hidden");
   $("giveup-btn").classList.remove("hidden");
@@ -110,6 +135,20 @@ function newRound() {
   updateCounts();
   updateHintBtn();
   $("guess").focus();
+}
+
+function newRound() {
+  isDailyGame = false;
+  secret = eng.randomSecret(lang, selectedDifficulty);
+  round += 1;
+  $("round-num").textContent = round;
+  resetRoundUI();
+}
+
+function startDaily() {
+  isDailyGame = true;
+  secret = eng.dailyWord(lang, daily.todayKey());
+  resetRoundUI();
 }
 
 $("new-round").addEventListener("click", newRound);
@@ -192,8 +231,13 @@ $("giveup-btn").addEventListener("click", async () => {
   banner.className = "banner lose";
   banner.textContent = `You gave up. The word was "${secret}".`;
   banner.classList.remove("hidden");
-  $("new-round").classList.remove("hidden");
   finishGame("gaveup", guesses.length);
+  if (isDailyGame) {
+    const d = daily.recordDaily(lang, "gaveup", guesses.length);
+    showDailyResult("gaveup", guesses.length, d.streak);
+  } else {
+    $("new-round").classList.remove("hidden");
+  }
 });
 
 function showWin(word, count) {
@@ -204,8 +248,84 @@ function showWin(word, count) {
   $("guess-form").classList.add("hidden");
   $("hint-btn").classList.add("hidden");
   $("giveup-btn").classList.add("hidden");
-  $("new-round").classList.remove("hidden");
   finishGame("won", count);
+  if (isDailyGame) {
+    const d = daily.recordDaily(lang, "won", count);
+    showDailyResult("won", count, d.streak);
+  } else {
+    $("new-round").classList.remove("hidden");
+  }
+}
+
+// ---- Daily result + share ------------------------------------------------
+let lastDailyShare = null;
+
+function showDailyResult(status, count, streak) {
+  $("new-round").classList.add("hidden");
+  $("daily-result").classList.remove("hidden");
+  $("daily-streak").textContent =
+    status === "won" ? `🔥 ${streak}-day streak` : "Streak reset — try again tomorrow";
+  lastDailyShare = { status, count, streak, date: daily.todayKey(), lang };
+}
+
+// Already played today's word — show the result, no replay.
+function showDailyDone(d) {
+  isDailyGame = true;
+  $("guess-form").classList.add("hidden");
+  $("hint-btn").classList.add("hidden");
+  $("giveup-btn").classList.add("hidden");
+  $("guesses").classList.add("hidden");
+  $("history").classList.add("hidden");
+  const won = d.result.status === "won";
+  const banner = $("win-banner");
+  banner.className = "banner " + (won ? "win" : "lose");
+  banner.textContent = won
+    ? `You solved today's word in ${d.result.guesses} guesses. Come back tomorrow! 🗓️`
+    : `You gave up on today's word. Come back tomorrow! 🗓️`;
+  banner.classList.remove("hidden");
+  showDailyResult(d.result.status, d.result.guesses, d.streak);
+}
+
+async function shareDaily() {
+  if (!lastDailyShare) return;
+  const s = lastDailyShare;
+  const langName = (LANG_META[s.lang] || {}).name || s.lang;
+  const url = `${location.origin}${location.pathname}`;
+  const line =
+    s.status === "won"
+      ? `Solved in ${s.count} guesses${s.streak > 0 ? ` · 🔥 ${s.streak}-day streak` : ""}`
+      : `Gave up today`;
+  const text = `Wordo 🗓️ ${s.date} · ${langName}\n${line}\n${url}`;
+  if (navigator.share) {
+    try {
+      await navigator.share({ text });
+      return;
+    } catch {
+      /* fall through to clipboard */
+    }
+  }
+  copyText(text, $("share-btn"), "✓ Copied!");
+}
+$("share-btn").addEventListener("click", shareDaily);
+
+async function copyText(text, btn, okLabel) {
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    const ta = document.createElement("textarea");
+    ta.value = text;
+    ta.style.position = "fixed";
+    ta.style.opacity = "0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); } catch {}
+    ta.remove();
+  }
+  if (btn) {
+    const old = btn.textContent;
+    btn.textContent = okLabel;
+    setTimeout(() => (btn.textContent = old), 1500);
+  }
 }
 
 // Persist the finished game, refresh stats, celebrate new achievements / rank-ups.
@@ -215,7 +335,7 @@ function finishGame(result, guesses) {
     guesses,
     hints: hintsUsed,
     lang,
-    difficulty: selectedDifficulty,
+    difficulty: isDailyGame ? "daily" : selectedDifficulty,
     sessionCount: round,
   });
   renderStats();
