@@ -288,13 +288,26 @@ function openAchModal() {
   $("ach-modal-title").textContent = `Achievements (${earned}/${list.length})`;
   const grid = $("ach-grid");
   grid.innerHTML = "";
-  for (const a of list) {
-    const el = document.createElement("div");
-    el.className = "ach" + (a.earned ? " earned" : "");
-    el.innerHTML =
-      `<span class="ach-icon">${a.earned ? a.icon : "🔒"}</span>` +
-      `<span class="ach-text"><span class="ach-name">${a.name}</span><span class="ach-desc">${esc(a.desc)}</span></span>`;
-    grid.appendChild(el);
+  // Group related/tiered achievements onto the same row.
+  for (const group of stats.GROUPS) {
+    const items = list.filter((a) => a.group === group.id);
+    if (!items.length) continue;
+    const section = document.createElement("div");
+    section.className = "ach-group";
+    const got = items.filter((a) => a.earned).length;
+    section.innerHTML = `<div class="ach-group-title">${group.name} <span>${got}/${items.length}</span></div>`;
+    const row = document.createElement("div");
+    row.className = "ach-row";
+    for (const a of items) {
+      const el = document.createElement("div");
+      el.className = "ach" + (a.earned ? " earned" : "");
+      el.innerHTML =
+        `<span class="ach-icon">${a.earned ? a.icon : "🔒"}</span>` +
+        `<span class="ach-name">${esc(a.name)}</span><span class="ach-desc">${esc(a.desc)}</span>`;
+      row.appendChild(el);
+    }
+    section.appendChild(row);
+    grid.appendChild(section);
   }
   $("ach-modal").classList.remove("hidden");
 }
