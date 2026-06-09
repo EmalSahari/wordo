@@ -193,6 +193,49 @@ main { grid-area: main; }
 .chart-bar.gaveup { background: var(--error); opacity: 0.7; }
 .chart-num { text-align: center; font-size: 11px; color: var(--muted); margin-top: 5px; font-variant-numeric: tabular-nums; }
 
+/* Difficulty buttons */
+.diff-btn {
+  flex: 1; background: var(--bg-elev); color: var(--text); border: 1px solid var(--line);
+  padding: 9px 12px; border-radius: 10px; font-size: 14px;
+}
+.diff-btn.active { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); }
+.diff-btn:not(.active):hover { border-color: var(--accent); }
+
+/* Closest-guess warmth meter (#3) */
+.closest { background: var(--bg-card); border: 1px solid var(--line); border-radius: 10px; padding: 11px 14px; margin-bottom: 14px; }
+.closest-top { display: flex; align-items: baseline; gap: 9px; margin-bottom: 9px; }
+.closest-label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 1px; }
+.closest-word { font-weight: 700; font-size: 16px; }
+.closest-rank { margin-left: auto; font-variant-numeric: tabular-nums; font-weight: 700; }
+.closest-meter { height: 8px; background: var(--bg-elev); border-radius: 999px; overflow: hidden; }
+.closest-fill { height: 100%; border-radius: 999px; width: 0; transition: width 0.5s cubic-bezier(0.2, 0.8, 0.2, 1), background 0.3s; }
+.closest.warmer { animation: warmerPulse 0.7s ease; }
+@keyframes warmerPulse {
+  0% { box-shadow: 0 0 0 0 rgba(240, 162, 58, 0.5); }
+  100% { box-shadow: 0 0 0 9px rgba(240, 162, 58, 0); }
+}
+
+/* Achievements (#7) */
+.achievements { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ach { background: var(--bg-card); border-radius: 10px; padding: 10px 5px; text-align: center; opacity: 0.32; transition: opacity 0.3s; }
+.ach.earned { opacity: 1; background: var(--bg-elev); }
+.ach-icon { font-size: 20px; display: block; filter: grayscale(1); }
+.ach.earned .ach-icon { filter: none; }
+.ach-name { font-size: 10px; color: var(--muted); margin-top: 3px; line-height: 1.2; }
+
+/* Mobile polish (#6) */
+@media (max-width: 600px) {
+  #app { padding: 16px 12px 48px; }
+  .logo { font-size: 44px; }
+  .game-header { gap: 8px 10px; }
+  .logo.small { font-size: 19px; }
+  .round-badge, .count-badge { font-size: 13px; }
+  .game-header .ghost { padding: 6px 10px; font-size: 13px; }
+  .game-header #sound-btn { margin-left: auto; }
+  .guess-row { padding: 10px 12px; }
+  .card { padding: 20px; }
+}
+
 /* Solo mode: drop the multiplayer scoreboard/feed (keep the history column) */
 #game.solo .game-grid { grid-template-columns: 200px 1fr; grid-template-areas: "history main"; max-width: 880px; }
 #game.solo #sidebar { display: none; }

@@ -3,6 +3,7 @@
 
 import * as eng from "./engine.js";
 import * as sfx from "./sound.js";
+import * as stats from "./stats.js";
 
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => n.toLocaleString("en-US");
@@ -22,7 +23,16 @@ let hintsUsed = 0;
 let maxRank = 25000;
 let rowEls = new Map();
 let selectedLang = null;
-let sessionGames = []; // { result: 'won'|'gaveup', guesses }
+let selectedDifficulty = "easy";
+let bestRank = Infinity; // warmest guess this round (for the closest meter)
+
+// Difficulty buttons
+for (const btn of document.querySelectorAll(".diff-btn")) {
+  btn.addEventListener("click", () => {
+    selectedDifficulty = btn.dataset.diff;
+    document.querySelectorAll(".diff-btn").forEach((b) => b.classList.toggle("active", b === btn));
+  });
+}
 
 // ---- Language picker (required choice) -----------------------------------
 const langBox = $("lang-options");
@@ -82,15 +92,17 @@ $("leave-btn").addEventListener("click", () => location.reload());
 
 // ---- Round lifecycle -----------------------------------------------------
 function newRound() {
-  secret = eng.randomSecret(lang);
+  secret = eng.randomSecret(lang, selectedDifficulty);
   guesses = [];
   roundEnded = false;
   hintsUsed = 0;
+  bestRank = Infinity;
   rowEls = new Map();
   round += 1;
   $("round-num").textContent = round;
   $("guesses").innerHTML = "";
   $("history-list").innerHTML = `<li class="history-empty">No guesses yet</li>`;
+  $("closest").classList.add("hidden");
   $("win-banner").classList.add("hidden");
   $("new-round").classList.add("hidden");
   $("guess-msg").textContent = "";
@@ -138,8 +150,11 @@ function submitGuess(word, isHint = false) {
   guesses.push(g);
   if (isHint) hintsUsed += 1;
 
+  const improved = g.rank < bestRank;
+  if (improved) bestRank = g.rank;
   renderGuesses(g);
   renderHistory(g.word);
+  renderClosest(improved);
   updateCounts();
   updateHintBtn();
 
@@ -184,8 +199,8 @@ $("giveup-btn").addEventListener("click", async () => {
   banner.textContent = `You gave up. The word was "${secret}".`;
   banner.classList.remove("hidden");
   $("new-round").classList.remove("hidden");
-  sessionGames.push({ result: "gaveup", guesses: guesses.length });
-  renderStats();
+  $("closest").classList.add("hidden");
+  finishGame("gaveup", guesses.length);
 });
 
 function showWin(word, count) {
@@ -197,55 +212,102 @@ function showWin(word, count) {
   $("hint-btn").classList.add("hidden");
   $("giveup-btn").classList.add("hidden");
   $("new-round").classList.remove("hidden");
-  sessionGames.push({ result: "won", guesses: count });
-  renderStats();
+  finishGame("won", count);
 }
 
-// ---- Session stats (right column) ----------------------------------------
+// Persist the finished game, refresh stats, celebrate any new achievements.
+function finishGame(result, guesses) {
+  const { newlyEarned } = stats.recordGame({ result, guesses, hints: hintsUsed });
+  renderStats();
+  if (newlyEarned.length) {
+    newlyEarned.forEach((a, i) => setTimeout(() => showAchievementToast(a), 700 + i * 1400));
+  }
+}
+
+// ---- Persistent stats (right column, #7) ---------------------------------
 function perfClass(g) {
   return g <= 15 ? "good" : g <= 40 ? "ok" : "far";
 }
 function renderStats() {
   const summary = $("stats-summary");
   const chart = $("stats-chart");
-  const played = sessionGames.length;
-  if (!played) {
-    summary.innerHTML = `<div class="stats-empty">Finish a game to see your stats.</div>`;
+  const a = stats.aggregate();
+  if (!a.played) {
+    summary.innerHTML = `<div class="stats-empty">Finish a game to start tracking your stats.</div>`;
     chart.innerHTML = "";
-    return;
-  }
-  const wins = sessionGames.filter((g) => g.result === "won");
-  const vals = wins.map((g) => g.guesses);
-  const avg = vals.length ? vals.reduce((a, b) => a + b, 0) / vals.length : 0;
-  const best = vals.length ? Math.min(...vals) : null;
+  } else {
+    summary.innerHTML = `
+      <div class="stat"><span class="stat-val">${a.played}</span><span class="stat-lbl">Played</span></div>
+      <div class="stat"><span class="stat-val">${a.solved}</span><span class="stat-lbl">Solved</span></div>
+      <div class="stat"><span class="stat-val">${a.avg != null ? a.avg.toFixed(1) : "–"}</span><span class="stat-lbl">Avg guesses</span></div>
+      <div class="stat"><span class="stat-val">${a.best ?? "–"}</span><span class="stat-lbl">Best</span></div>
+      <div class="stat"><span class="stat-val">🔥 ${a.winStreak}</span><span class="stat-lbl">Win streak</span></div>
+      <div class="stat"><span class="stat-val">${a.bestStreak}</span><span class="stat-lbl">Best streak</span></div>`;
 
-  summary.innerHTML = `
-    <div class="stat"><span class="stat-val">${played}</span><span class="stat-lbl">Played</span></div>
-    <div class="stat"><span class="stat-val">${wins.length}</span><span class="stat-lbl">Solved</span></div>
-    <div class="stat"><span class="stat-val">${vals.length ? avg.toFixed(1) : "–"}</span><span class="stat-lbl">Avg guesses</span></div>
-    <div class="stat"><span class="stat-val">${best ?? "–"}</span><span class="stat-lbl">Best</span></div>`;
-
-  const recent = sessionGames.slice(-12);
-  const maxG = Math.max(1, ...recent.filter((g) => g.result === "won").map((g) => g.guesses));
-  chart.innerHTML = "";
-  for (const g of recent) {
-    const col = document.createElement("div");
-    col.className = "chart-col";
-    const bar = document.createElement("div");
-    bar.className = "chart-bar " + (g.result === "won" ? perfClass(g.guesses) : "gaveup");
-    bar.style.height = (g.result === "won" ? Math.max(8, (g.guesses / maxG) * 100) : 100) + "%";
-    bar.title = g.result === "won" ? `${g.guesses} guesses` : "gave up";
-    const num = document.createElement("div");
-    num.className = "chart-num";
-    num.textContent = g.result === "won" ? g.guesses : "✗";
-    col.append(bar, num);
-    chart.appendChild(col);
+    const maxG = Math.max(1, ...a.recent.filter((g) => g.result === "won").map((g) => g.guesses));
+    chart.innerHTML = "";
+    for (const g of a.recent) {
+      const col = document.createElement("div");
+      col.className = "chart-col";
+      const bar = document.createElement("div");
+      bar.className = "chart-bar " + (g.result === "won" ? perfClass(g.guesses) : "gaveup");
+      bar.style.height = (g.result === "won" ? Math.max(8, (g.guesses / maxG) * 100) : 100) + "%";
+      bar.title = g.result === "won" ? `${g.guesses} guesses` : "gave up";
+      const num = document.createElement("div");
+      num.className = "chart-num";
+      num.textContent = g.result === "won" ? g.guesses : "✗";
+      col.append(bar, num);
+      chart.appendChild(col);
+    }
   }
+
+  const ach = $("achievements");
+  ach.innerHTML = "";
+  for (const item of stats.achievements()) {
+    const el = document.createElement("div");
+    el.className = "ach" + (item.earned ? " earned" : "");
+    el.title = item.name;
+    el.innerHTML = `<span class="ach-icon">${item.icon}</span><span class="ach-name">${item.name}</span>`;
+    ach.appendChild(el);
+  }
+}
+
+function showAchievementToast(a) {
+  const el = $("toast");
+  el.innerHTML = `<span class="t-word">${a.icon} ${a.name}</span><span class="t-rank">unlocked</span>`;
+  el.style.borderColor = "var(--accent)";
+  el.classList.remove("hidden", "show");
+  void el.offsetWidth;
+  el.classList.add("show");
+  sfx.playClick();
 }
 
 function updateCounts() {
   $("guess-count").textContent = guesses.length;
   $("history-title").textContent = guesses.length ? `Your guesses (${guesses.length})` : "Your guesses";
+}
+
+// ---- Closest-guess warmth meter (#3) -------------------------------------
+function renderClosest(improved) {
+  if (!guesses.length) {
+    $("closest").classList.add("hidden");
+    return;
+  }
+  const best = guesses.reduce((a, b) => (b.rank < a.rank ? b : a));
+  const color = rankColor(best.rank);
+  $("closest").classList.remove("hidden");
+  $("closest-word").textContent = (best.hint ? "💡 " : "") + best.word;
+  $("closest-rank").textContent = `${fmt(best.rank)} ${rankEmoji(best.rank)}`;
+  $("closest-rank").style.color = color;
+  const fill = $("closest-fill");
+  fill.style.width = 100 - warmth(best.rank) * 100 + "%";
+  fill.style.background = color;
+  if (improved) {
+    const c = $("closest");
+    c.classList.remove("warmer");
+    void c.offsetWidth;
+    c.classList.add("warmer");
+  }
 }
 
 // ---- Warmth colours ------------------------------------------------------

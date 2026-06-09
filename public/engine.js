@@ -42,10 +42,14 @@ export function dailyWord(lang, dateKey) {
   return d.secrets[h % d.secrets.length];
 }
 
-export function randomSecret(lang) {
+// Secrets are frequency-ordered (most common first), so an easier game draws from
+// the most common, concrete words; harder games reach into the rarer tail.
+export function randomSecret(lang, difficulty = "easy") {
   const d = langs.get(lang);
   if (!d || !d.secrets.length) return null;
-  return d.secrets[Math.floor(Math.random() * d.secrets.length)];
+  const n = d.secrets.length;
+  const cap = difficulty === "easy" ? Math.min(300, n) : difficulty === "hard" ? n : Math.min(800, n);
+  return d.secrets[Math.floor(Math.random() * cap)];
 }
 
 function ensureRanks(d, secret) {

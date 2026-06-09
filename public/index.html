@@ -23,6 +23,14 @@
             <span class="lang-label">Choose a language <span class="hint">(the words you'll guess)</span></span>
             <div id="lang-options" class="lang-options"></div>
           </div>
+          <div class="lang-field">
+            <span class="lang-label">Difficulty</span>
+            <div id="diff-options" class="lang-options">
+              <button type="button" class="diff-btn active" data-diff="easy">Easy</button>
+              <button type="button" class="diff-btn" data-diff="medium">Medium</button>
+              <button type="button" class="diff-btn" data-diff="hard">Hard</button>
+            </div>
+          </div>
           <div class="row">
             <button type="submit" id="join-btn" class="primary" disabled>Play</button>
           </div>
@@ -51,6 +59,15 @@
             </form>
             <p id="guess-msg" class="guess-msg"></p>
 
+            <div id="closest" class="closest hidden">
+              <div class="closest-top">
+                <span class="closest-label">Closest</span>
+                <span id="closest-word" class="closest-word"></span>
+                <span id="closest-rank" class="closest-rank"></span>
+              </div>
+              <div class="closest-meter"><div id="closest-fill" class="closest-fill"></div></div>
+            </div>
+
             <div class="action-row">
               <button id="hint-btn" class="ghost hint-btn hidden">💡 Get a hint</button>
               <button id="giveup-btn" class="ghost giveup-btn hidden">Give up</button>
@@ -65,10 +82,12 @@
           </aside>
 
           <aside id="stats">
-            <h2>This session</h2>
+            <h2>Your stats</h2>
             <div id="stats-summary" class="stats-summary"></div>
-            <div class="stats-chart-title">Guesses per game</div>
+            <div class="stats-chart-title">Recent games</div>
             <div id="stats-chart" class="stats-chart"></div>
+            <div class="stats-chart-title">Achievements</div>
+            <div id="achievements" class="achievements"></div>
           </aside>
         </div>
       </section>
