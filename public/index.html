@@ -12,7 +12,7 @@
       href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="style.css?v=10" />
+    <link rel="stylesheet" href="style.css?v=11" />
   </head>
   <body>
     <div id="app">
@@ -53,7 +53,7 @@
           <span class="daily-badge hidden" id="daily-badge">🗓️ Daily</span>
           <span class="count-badge">Guesses <strong id="guess-count">0</strong></span>
           <button id="sound-btn" class="ghost icon-btn" title="Sound on/off">🔊</button>
-          <button id="leave-btn" class="ghost">Change language</button>
+          <button id="leave-btn" class="ghost">Menu</button>
         </header>
 
         <div id="win-banner" class="banner hidden"></div>
@@ -75,7 +75,8 @@
             <div id="daily-result" class="daily-result hidden">
               <div id="daily-streak" class="daily-streak"></div>
               <button type="button" id="share-btn" class="primary full">🔗 Share result</button>
-              <p class="daily-come-back">Come back tomorrow for a new word.</p>
+              <button type="button" id="play-solo-btn" class="ghost full">🎮 Play Solo instead</button>
+              <p class="daily-come-back">Come back tomorrow for a new daily word.</p>
             </div>
             <ul id="guesses" class="guesses"></ul>
           </main>
@@ -116,6 +117,6 @@
         <div id="ach-grid" class="ach-grid"></div>
       </div>
     </div>
-    <script src="app.js?v=10" type="module"></script>
+    <script src="app.js?v=11" type="module"></script>
   </body>
 </html>
