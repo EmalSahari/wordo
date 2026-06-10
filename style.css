@@ -276,9 +276,8 @@ main { grid-area: main; }
 
 /* ...but pinned to the bottom-right corner while playing, so it never scrolls away. */
 #game:not(.hidden) ~ .site-footer {
-  position: fixed; right: 14px; bottom: 10px; z-index: 30;
-  margin: 0; padding: 5px 10px; text-align: right; font-size: 12px;
-  background: rgba(11, 13, 17, 0.6); border-radius: 8px; backdrop-filter: blur(3px);
+  position: fixed; right: 16px; bottom: 12px; z-index: 30;
+  margin: 0; padding: 0; text-align: right; font-size: 12px;
 }
 
 /* Daily leaderboard panel */
