@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://wordo.sahari.io/sitemap.xml
