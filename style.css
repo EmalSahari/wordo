@@ -269,10 +269,17 @@ main { grid-area: main; }
 .daily-streak { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
 .daily-come-back { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
 
-/* Footer */
+/* Footer — centered at the bottom on the start screen, ... */
 .site-footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 36px; padding: 16px 0 8px; }
 .site-footer a { color: var(--accent); text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; }
+
+/* ...but pinned to the bottom-right corner while playing, so it never scrolls away. */
+#game:not(.hidden) ~ .site-footer {
+  position: fixed; right: 14px; bottom: 10px; z-index: 30;
+  margin: 0; padding: 5px 10px; text-align: right; font-size: 12px;
+  background: rgba(11, 13, 17, 0.6); border-radius: 8px; backdrop-filter: blur(3px);
+}
 
 /* Daily leaderboard panel */
 .leaderboard {
