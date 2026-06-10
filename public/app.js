@@ -1,10 +1,10 @@
 // Wordo — singleplayer, fully client-side. Scoring runs in the browser (engine.js);
 // no server, no network calls during play.
 
-import * as eng from "./engine.js?v=17";
-import * as sfx from "./sound.js?v=17";
-import * as stats from "./stats.js?v=17";
-import * as daily from "./daily.js?v=17";
+import * as eng from "./engine.js?v=18";
+import * as sfx from "./sound.js?v=18";
+import * as stats from "./stats.js?v=18";
+import * as daily from "./daily.js?v=18";
 
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => n.toLocaleString("en-US");
@@ -24,9 +24,15 @@ let hintsUsed = 0;
 let maxRank = 25000;
 let rowEls = new Map();
 let selectedLang = null;
-let selectedDifficulty = "easy";
+let selectedDifficulty = null;
 let mode = "solo"; // chosen on the start screen: "daily" | "solo"
 let isDailyGame = false; // the current game is the daily challenge
+
+// Enable Play only once everything required for the mode is chosen.
+function updatePlayEnabled() {
+  const needDifficulty = mode === "solo";
+  $("join-btn").disabled = !(selectedLang && (!needDifficulty || selectedDifficulty));
+}
 
 // Mode tabs (Daily / Solo)
 for (const tab of document.querySelectorAll(".mode-tab")) {
@@ -38,6 +44,7 @@ for (const tab of document.querySelectorAll(".mode-tab")) {
       mode === "daily"
         ? "One shared word for everyone today. Keep your streak going."
         : "Unlimited practice with a random word. Pick a difficulty.";
+    updatePlayEnabled();
   });
 }
 
@@ -46,6 +53,7 @@ for (const btn of document.querySelectorAll(".diff-btn")) {
   btn.addEventListener("click", () => {
     selectedDifficulty = btn.dataset.diff;
     document.querySelectorAll(".diff-btn").forEach((b) => b.classList.toggle("active", b === btn));
+    updatePlayEnabled();
   });
 }
 
@@ -61,7 +69,7 @@ for (const code of LANGUAGES) {
   btn.addEventListener("click", () => {
     selectedLang = code;
     langBox.querySelectorAll(".lang-btn").forEach((b) => b.classList.toggle("active", b === btn));
-    $("join-btn").disabled = false;
+    updatePlayEnabled();
   });
   langBox.appendChild(btn);
 }
@@ -72,6 +80,10 @@ $("join-form").addEventListener("submit", async (e) => {
   $("join-error").textContent = "";
   if (!selectedLang) {
     $("join-error").textContent = "Pick a language first.";
+    return;
+  }
+  if (mode === "solo" && !selectedDifficulty) {
+    $("join-error").textContent = "Pick a difficulty.";
     return;
   }
   sfx.prime();
