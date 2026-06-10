@@ -1,10 +1,10 @@
 // Wordo — singleplayer, fully client-side. Scoring runs in the browser (engine.js);
 // no server, no network calls during play.
 
-import * as eng from "./engine.js?v=11";
-import * as sfx from "./sound.js?v=11";
-import * as stats from "./stats.js?v=11";
-import * as daily from "./daily.js?v=11";
+import * as eng from "./engine.js?v=12";
+import * as sfx from "./sound.js?v=12";
+import * as stats from "./stats.js?v=12";
+import * as daily from "./daily.js?v=12";
 
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => n.toLocaleString("en-US");
