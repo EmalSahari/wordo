@@ -267,6 +267,11 @@ main { grid-area: main; }
 .daily-streak { font-size: 18px; font-weight: 700; margin-bottom: 12px; }
 .daily-come-back { color: var(--muted); font-size: 13px; margin: 12px 0 0; }
 
+/* Footer */
+.site-footer { text-align: center; color: var(--muted); font-size: 13px; margin-top: 36px; padding: 16px 0 8px; }
+.site-footer a { color: var(--accent); text-decoration: none; }
+.site-footer a:hover { text-decoration: underline; }
+
 /* Daily leaderboard panel */
 .leaderboard {
   background: var(--bg-card); border: 1px solid var(--line); border-radius: var(--radius);
