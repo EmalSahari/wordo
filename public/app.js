@@ -25,7 +25,7 @@ let maxRank = 25000;
 let rowEls = new Map();
 let selectedLang = null;
 let selectedDifficulty = "easy";
-let mode = "daily"; // chosen on the start screen: "daily" | "solo"
+let mode = "solo"; // chosen on the start screen: "daily" | "solo"
 let isDailyGame = false; // the current game is the daily challenge
 
 // Mode tabs (Daily / Solo)
