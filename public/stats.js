@@ -16,42 +16,42 @@ export const GROUPS = [
 ];
 
 const ACHIEVEMENTS = [
-  { id: "first_win", group: "solving", icon: "🎉", name: "First solve", desc: "Win your first game", test: (g, s) => s.solved >= 1 },
-  { id: "wins_5", group: "solving", icon: "🌟", name: "Getting good", desc: "Solve 5 games", test: (g, s) => s.solved >= 5 },
-  { id: "wins_25", group: "solving", icon: "⭐", name: "Wordsmith", desc: "Solve 25 games", test: (g, s) => s.solved >= 25 },
-  { id: "wins_50", group: "solving", icon: "💫", name: "Veteran", desc: "Solve 50 games", test: (g, s) => s.solved >= 50 },
-  { id: "wins_100", group: "solving", icon: "👑", name: "Word master", desc: "Solve 100 games", test: (g, s) => s.solved >= 100 },
-  { id: "sharp_20", group: "speed", icon: "🎯", name: "On target", desc: "Solve in 20 or fewer", test: (g) => g.result === "won" && g.guesses <= 20 },
-  { id: "sharp_10", group: "speed", icon: "🔥", name: "Sharp", desc: "Solve in 10 or fewer", test: (g) => g.result === "won" && g.guesses <= 10 },
-  { id: "sharp_5", group: "speed", icon: "⚡", name: "Razor sharp", desc: "Solve in 5 or fewer", test: (g) => g.result === "won" && g.guesses <= 5 },
-  { id: "sharp_3", group: "speed", icon: "🧨", name: "Genius", desc: "Solve in 3 or fewer", test: (g) => g.result === "won" && g.guesses <= 3 },
-  { id: "one_shot", group: "speed", icon: "🎰", name: "Hole in one", desc: "Solve on the first guess", test: (g) => g.result === "won" && g.guesses === 1 },
-  { id: "streak_3", group: "streaks", icon: "🔗", name: "On a roll", desc: "Win 3 in a row", test: (g, s) => s.winStreak >= 3 },
-  { id: "streak_5", group: "streaks", icon: "💪", name: "Unstoppable", desc: "Win 5 in a row", test: (g, s) => s.winStreak >= 5 },
-  { id: "streak_7", group: "streaks", icon: "⛓️", name: "Seven-up", desc: "Win 7 in a row", test: (g, s) => s.winStreak >= 7 },
-  { id: "streak_10", group: "streaks", icon: "🏆", name: "Relentless", desc: "Win 10 in a row", test: (g, s) => s.winStreak >= 10 },
-  { id: "no_hint", group: "nohint", icon: "🧠", name: "No help needed", desc: "Win without a hint", test: (g) => g.result === "won" && !g.hints },
-  { id: "no_hint_10", group: "nohint", icon: "🦉", name: "Self-made", desc: "Win 10 without hints", test: (g, s) => s.noHintWins >= 10 },
-  { id: "no_hint_25", group: "nohint", icon: "🦅", name: "Truly self-made", desc: "Win 25 without hints", test: (g, s) => s.noHintWins >= 25 },
-  { id: "games_10", group: "experience", icon: "🎮", name: "Warming up", desc: "Play 10 games", test: (g, s) => s.played >= 10 },
-  { id: "games_25", group: "experience", icon: "🎲", name: "Regular", desc: "Play 25 games", test: (g, s) => s.played >= 25 },
-  { id: "games_50", group: "experience", icon: "🕹️", name: "Dedicated", desc: "Play 50 games", test: (g, s) => s.played >= 50 },
-  { id: "games_100", group: "experience", icon: "🏅", name: "Centurion", desc: "Play 100 games", test: (g, s) => s.played >= 100 },
-  { id: "win_medium", group: "difficulty", icon: "🟠", name: "Stepping up", desc: "Win on Medium", test: (g) => g.result === "won" && g.difficulty === "medium" },
-  { id: "win_hard", group: "difficulty", icon: "🔴", name: "Brave", desc: "Win on Hard", test: (g) => g.result === "won" && g.difficulty === "hard" },
-  { id: "hard_sharp", group: "difficulty", icon: "💎", name: "Hardcore", desc: "Win Hard in 15 or fewer", test: (g) => g.result === "won" && g.difficulty === "hard" && g.guesses <= 15 },
-  { id: "comeback", group: "special", icon: "🔄", name: "Comeback", desc: "Win right after giving up", test: (g, s) => g.result === "won" && s.prevResult === "gaveup" },
-  { id: "marathon", group: "special", icon: "🏃", name: "Marathon", desc: "Play 5 in one sitting", test: (g) => (g.sessionCount || 0) >= 5 },
-  { id: "explorer", group: "special", icon: "🧭", name: "Explorer", desc: "Try all three difficulties", test: (g, s) => s.difficultiesPlayed.size >= 3 },
+  { id: "first_win", group: "solving", name: "First solve", desc: "Win your first game", test: (g, s) => s.solved >= 1 },
+  { id: "wins_5", group: "solving", name: "Getting good", desc: "Solve 5 games", test: (g, s) => s.solved >= 5 },
+  { id: "wins_25", group: "solving", name: "Wordsmith", desc: "Solve 25 games", test: (g, s) => s.solved >= 25 },
+  { id: "wins_50", group: "solving", name: "Veteran", desc: "Solve 50 games", test: (g, s) => s.solved >= 50 },
+  { id: "wins_100", group: "solving", name: "Word master", desc: "Solve 100 games", test: (g, s) => s.solved >= 100 },
+  { id: "sharp_20", group: "speed", name: "On target", desc: "Solve in 20 or fewer", test: (g) => g.result === "won" && g.guesses <= 20 },
+  { id: "sharp_10", group: "speed", name: "Sharp", desc: "Solve in 10 or fewer", test: (g) => g.result === "won" && g.guesses <= 10 },
+  { id: "sharp_5", group: "speed", name: "Razor sharp", desc: "Solve in 5 or fewer", test: (g) => g.result === "won" && g.guesses <= 5 },
+  { id: "sharp_3", group: "speed", name: "Genius", desc: "Solve in 3 or fewer", test: (g) => g.result === "won" && g.guesses <= 3 },
+  { id: "one_shot", group: "speed", name: "Hole in one", desc: "Solve on the first guess", test: (g) => g.result === "won" && g.guesses === 1 },
+  { id: "streak_3", group: "streaks", name: "On a roll", desc: "Win 3 in a row", test: (g, s) => s.winStreak >= 3 },
+  { id: "streak_5", group: "streaks", name: "Unstoppable", desc: "Win 5 in a row", test: (g, s) => s.winStreak >= 5 },
+  { id: "streak_7", group: "streaks", name: "Seven-up", desc: "Win 7 in a row", test: (g, s) => s.winStreak >= 7 },
+  { id: "streak_10", group: "streaks", name: "Relentless", desc: "Win 10 in a row", test: (g, s) => s.winStreak >= 10 },
+  { id: "no_hint", group: "nohint", name: "No help needed", desc: "Win without a hint", test: (g) => g.result === "won" && !g.hints },
+  { id: "no_hint_10", group: "nohint", name: "Self-made", desc: "Win 10 without hints", test: (g, s) => s.noHintWins >= 10 },
+  { id: "no_hint_25", group: "nohint", name: "Truly self-made", desc: "Win 25 without hints", test: (g, s) => s.noHintWins >= 25 },
+  { id: "games_10", group: "experience", name: "Warming up", desc: "Play 10 games", test: (g, s) => s.played >= 10 },
+  { id: "games_25", group: "experience", name: "Regular", desc: "Play 25 games", test: (g, s) => s.played >= 25 },
+  { id: "games_50", group: "experience", name: "Dedicated", desc: "Play 50 games", test: (g, s) => s.played >= 50 },
+  { id: "games_100", group: "experience", name: "Centurion", desc: "Play 100 games", test: (g, s) => s.played >= 100 },
+  { id: "win_medium", group: "difficulty", name: "Stepping up", desc: "Win on Medium", test: (g) => g.result === "won" && g.difficulty === "medium" },
+  { id: "win_hard", group: "difficulty", name: "Brave", desc: "Win on Hard", test: (g) => g.result === "won" && g.difficulty === "hard" },
+  { id: "hard_sharp", group: "difficulty", name: "Hardcore", desc: "Win Hard in 15 or fewer", test: (g) => g.result === "won" && g.difficulty === "hard" && g.guesses <= 15 },
+  { id: "comeback", group: "special", name: "Comeback", desc: "Win right after giving up", test: (g, s) => g.result === "won" && s.prevResult === "gaveup" },
+  { id: "marathon", group: "special", name: "Marathon", desc: "Play 5 in one sitting", test: (g) => (g.sessionCount || 0) >= 5 },
+  { id: "explorer", group: "special", name: "Explorer", desc: "Try all three difficulties", test: (g, s) => s.difficultiesPlayed.size >= 3 },
 ];
 
 const RANKS = [
-  { min: 0, name: "Novice", color: "#8a93a6", icon: "🔰" },
-  { min: 4, name: "Bronze", color: "#cd7f32", icon: "🥉" },
-  { min: 9, name: "Silver", color: "#c5ccd6", icon: "🥈" },
-  { min: 15, name: "Gold", color: "#f0c34a", icon: "🥇" },
-  { min: 21, name: "Platinum", color: "#5fd0d6", icon: "💠" },
-  { min: 27, name: "Diamond", color: "#7fb8ff", icon: "💎" },
+  { min: 0, name: "Novice", color: "#8a93a6" },
+  { min: 4, name: "Bronze", color: "#cd7f32" },
+  { min: 9, name: "Silver", color: "#c5ccd6" },
+  { min: 15, name: "Gold", color: "#f0c34a" },
+  { min: 21, name: "Platinum", color: "#5fd0d6" },
+  { min: 27, name: "Diamond", color: "#7fb8ff" },
 ];
 
 export function rankFor(count) {
@@ -62,7 +62,6 @@ export function rankFor(count) {
   return {
     name: cur.name,
     color: cur.color,
-    icon: cur.icon,
     count,
     next: next ? { name: next.name, needed: next.min - count, from: cur.min, to: next.min } : null,
   };
@@ -141,5 +140,5 @@ export function recordGame(g) {
 }
 
 export function achievements() {
-  return ACHIEVEMENTS.map((a) => ({ id: a.id, group: a.group, icon: a.icon, name: a.name, desc: a.desc, earned: !!data.achievements[a.id] }));
+  return ACHIEVEMENTS.map((a) => ({ id: a.id, group: a.group, name: a.name, desc: a.desc, earned: !!data.achievements[a.id] }));
 }

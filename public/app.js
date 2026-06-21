@@ -1,10 +1,10 @@
 // Wordo — singleplayer, fully client-side. Scoring runs in the browser (engine.js);
 // no server, no network calls during play.
 
-import * as eng from "./engine.js?v=21";
-import * as sfx from "./sound.js?v=21";
-import * as stats from "./stats.js?v=21";
-import * as daily from "./daily.js?v=21";
+import * as eng from "./engine.js?v=22";
+import * as sfx from "./sound.js?v=22";
+import * as stats from "./stats.js?v=22";
+import * as daily from "./daily.js?v=22";
 
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => n.toLocaleString("en-US");
@@ -116,11 +116,13 @@ $("join-form").addEventListener("submit", async (e) => {
   }
 });
 
-$("sound-btn").textContent = sfx.soundEnabled() ? "🔊" : "🔇";
+const ICON_SOUND_ON = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg>`;
+const ICON_SOUND_OFF = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><line x1="22" y1="9" x2="16" y2="15"/><line x1="16" y1="9" x2="22" y2="15"/></svg>`;
+$("sound-btn").innerHTML = sfx.soundEnabled() ? ICON_SOUND_ON : ICON_SOUND_OFF;
 $("sound-btn").addEventListener("click", () => {
   const on = !sfx.soundEnabled();
   sfx.setSoundEnabled(on);
-  $("sound-btn").textContent = on ? "🔊" : "🔇";
+  $("sound-btn").innerHTML = on ? ICON_SOUND_ON : ICON_SOUND_OFF;
   if (on) sfx.playClick();
 });
 
@@ -228,7 +230,7 @@ function updateHintBtn() {
   const btn = $("hint-btn");
   btn.classList.toggle("hidden", roundEnded || hintsUsed > 0);
   btn.disabled = false;
-  btn.textContent = "💡 Get a hint";
+  btn.textContent = "Get a hint";
 }
 
 // ---- Give up -------------------------------------------------------------
@@ -256,7 +258,7 @@ $("giveup-btn").addEventListener("click", async () => {
 function showWin(word, count) {
   const banner = $("win-banner");
   banner.className = "banner win";
-  banner.textContent = `You guessed "${word}" in ${count} guesses! 🎉`;
+  banner.textContent = `Solved "${word}" in ${count} guesses.`;
   banner.classList.remove("hidden");
   $("guess-form").classList.add("hidden");
   $("hint-btn").classList.add("hidden");
@@ -278,7 +280,7 @@ function showDailyResult(status, count, streak) {
   $("new-round").classList.add("hidden");
   $("daily-result").classList.remove("hidden");
   $("daily-streak").textContent =
-    status === "won" ? `🔥 ${streak}-day streak` : "Streak reset — try again tomorrow";
+    status === "won" ? `${streak}-day streak` : "Streak reset — try again tomorrow";
   lastDailyShare = { status, count, streak, date: daily.todayKey(), lang };
 }
 
@@ -294,8 +296,8 @@ function showDailyDone(d) {
   const banner = $("win-banner");
   banner.className = "banner " + (won ? "win" : "lose");
   banner.textContent = won
-    ? `You solved today's word in ${d.result.guesses} guesses. Come back tomorrow! 🗓️`
-    : `You gave up on today's word. Come back tomorrow! 🗓️`;
+    ? `You solved today's word in ${d.result.guesses} guesses. Come back tomorrow.`
+    : `You gave up on today's word. Come back tomorrow.`;
   banner.classList.remove("hidden");
   showDailyResult(d.result.status, d.result.guesses, d.streak);
 }
@@ -307,9 +309,9 @@ async function shareDaily() {
   const url = `${location.origin}${location.pathname}`;
   const line =
     s.status === "won"
-      ? `Solved in ${s.count} guesses${s.streak > 0 ? ` · 🔥 ${s.streak}-day streak` : ""}`
+      ? `Solved in ${s.count} guesses${s.streak > 0 ? ` · ${s.streak}-day streak` : ""}`
       : `Gave up today`;
-  const text = `Wordo 🗓️ ${s.date} · ${langName}\n${line}\n${url}`;
+  const text = `Wordo · ${s.date} · ${langName}\n${line}\n${url}`;
   if (navigator.share) {
     try {
       await navigator.share({ text });
@@ -318,7 +320,7 @@ async function shareDaily() {
       /* fall through to clipboard */
     }
   }
-  copyText(text, $("share-btn"), "✓ Copied!");
+  copyText(text, $("share-btn"), "Copied to clipboard");
 }
 $("share-btn").addEventListener("click", shareDaily);
 
@@ -371,46 +373,25 @@ function finishGame(result, guesses) {
   if (rankUp) setTimeout(() => showRankUpToast(rankUp), delay);
 }
 
-// ---- Persistent stats (right column, #7) ---------------------------------
-function perfClass(g) {
-  return g <= 15 ? "good" : g <= 40 ? "ok" : "far";
-}
+// ---- Persistent stats (right column) -------------------------------------
 function renderStats() {
   const summary = $("stats-summary");
-  const chart = $("stats-chart");
   const a = stats.aggregate();
   if (!a.played) {
     summary.innerHTML = `<div class="stats-empty">Finish a game to start tracking your stats.</div>`;
-    chart.innerHTML = "";
   } else {
     summary.innerHTML = `
       <div class="stat"><span class="stat-val">${a.played}</span><span class="stat-lbl">Played</span></div>
       <div class="stat"><span class="stat-val">${a.solved}</span><span class="stat-lbl">Solved</span></div>
       <div class="stat"><span class="stat-val">${a.avg != null ? a.avg.toFixed(1) : "–"}</span><span class="stat-lbl">Avg guesses</span></div>
       <div class="stat"><span class="stat-val">${a.best ?? "–"}</span><span class="stat-lbl">Best</span></div>
-      <div class="stat"><span class="stat-val">🔥 ${a.winStreak}</span><span class="stat-lbl">Win streak</span></div>
+      <div class="stat"><span class="stat-val">${a.winStreak}</span><span class="stat-lbl">Win streak</span></div>
       <div class="stat"><span class="stat-val">${a.bestStreak}</span><span class="stat-lbl">Best streak</span></div>`;
-
-    const maxG = Math.max(1, ...a.recent.filter((g) => g.result === "won").map((g) => g.guesses));
-    chart.innerHTML = "";
-    for (const g of a.recent) {
-      const col = document.createElement("div");
-      col.className = "chart-col";
-      const bar = document.createElement("div");
-      bar.className = "chart-bar " + (g.result === "won" ? perfClass(g.guesses) : "gaveup");
-      bar.style.height = (g.result === "won" ? Math.max(8, (g.guesses / maxG) * 100) : 100) + "%";
-      bar.title = g.result === "won" ? `${g.guesses} guesses` : "gave up";
-      const num = document.createElement("div");
-      num.className = "chart-num";
-      num.textContent = g.result === "won" ? g.guesses : "✗";
-      col.append(bar, num);
-      chart.appendChild(col);
-    }
   }
 
   // Rank card
   const r = a.rank;
-  let html = `<div class="rank-top"><span class="rank-name" style="color:${r.color}">${r.icon} ${r.name}</span><span class="rank-count">${a.earnedCount}/${a.total}</span></div>`;
+  let html = `<div class="rank-top"><span class="rank-name"><span class="rank-dot" style="background:${r.color}"></span>${r.name}</span><span class="rank-count">${a.earnedCount}/${a.total}</span></div>`;
   if (r.next) {
     const span = r.next.to - r.next.from;
     const prog = span > 0 ? ((a.earnedCount - r.next.from) / span) * 100 : 0;
@@ -418,7 +399,7 @@ function renderStats() {
     html += `<div class="rank-sub">${r.next.needed} more to ${r.next.name}</div>`;
   } else {
     html += `<div class="rank-bar"><div class="rank-fill" style="width:100%;background:${r.color}"></div></div>`;
-    html += `<div class="rank-sub">Top rank reached 🎉</div>`;
+    html += `<div class="rank-sub">Top rank reached</div>`;
   }
   html += `<button type="button" id="ach-btn" class="ghost full">View achievements (${a.earnedCount}/${a.total})</button>`;
   $("rank-card").innerHTML = html;
@@ -446,8 +427,8 @@ function openAchModal() {
       const el = document.createElement("div");
       el.className = "ach" + (a.earned ? " earned" : "");
       el.innerHTML =
-        `<span class="ach-icon">${a.earned ? a.icon : "🔒"}</span>` +
-        `<span class="ach-name">${esc(a.name)}</span><span class="ach-desc">${esc(a.desc)}</span>`;
+        `<span class="ach-top"><span class="ach-name">${esc(a.name)}</span><span class="ach-mark"></span></span>` +
+        `<span class="ach-desc">${esc(a.desc)}</span>`;
       row.appendChild(el);
     }
     section.appendChild(row);
@@ -462,7 +443,7 @@ $("ach-modal").addEventListener("click", (e) => {
 
 function showAchievementToast(a) {
   const el = $("toast");
-  el.innerHTML = `<span class="t-word">${a.icon} ${esc(a.name)}</span><span class="t-rank">unlocked</span>`;
+  el.innerHTML = `<span class="t-word">${esc(a.name)}</span><span class="t-rank">unlocked</span>`;
   el.style.borderColor = "var(--accent)";
   el.classList.remove("hidden", "show");
   void el.offsetWidth;
@@ -472,7 +453,7 @@ function showAchievementToast(a) {
 
 function showRankUpToast(r) {
   const el = $("toast");
-  el.innerHTML = `<span class="t-word">${r.icon} ${r.name} rank!</span><span class="t-rank" style="color:${r.color}">level up</span>`;
+  el.innerHTML = `<span class="t-word">${r.name} rank</span><span class="t-rank" style="color:${r.color}">level up</span>`;
   el.style.borderColor = r.color;
   el.classList.remove("hidden", "show");
   void el.offsetWidth;
@@ -513,14 +494,6 @@ function rankColor(rank) {
   const t = warmth(rank);
   // tuned for contrast on the light/paper background
   return `hsl(${25 + t * 195}, ${82 - t * 27}%, ${47 - t * 3}%)`;
-}
-function rankEmoji(rank) {
-  if (rank === 1) return "🎉";
-  if (rank <= 50) return "🔥";
-  if (rank <= 300) return "😅";
-  if (rank <= 1000) return "🙂";
-  if (rank <= 5000) return "😐";
-  return "❄️";
 }
 
 // ---- Sorted list (with FLIP animation) -----------------------------------
@@ -573,11 +546,11 @@ function rowFor(g) {
   bar.style.width = 100 - warmth(g.rank) * 100 + "%";
   const word = document.createElement("span");
   word.className = "word";
-  word.textContent = (g.hint ? "💡 " : "") + g.word;
+  word.textContent = g.word;
   const rank = document.createElement("span");
   rank.className = "rank";
   rank.style.color = color;
-  rank.textContent = `${fmt(g.rank)} ${rankEmoji(g.rank)}`;
+  rank.textContent = fmt(g.rank);
   li.append(bar, word, rank);
   return li;
 }
@@ -597,7 +570,7 @@ function renderHistory(newestWord) {
     const color = rankColor(g.rank);
     const w = document.createElement("span");
     w.className = "hword";
-    w.textContent = (g.hint ? "💡 " : "") + g.word;
+    w.textContent = g.word;
     const r = document.createElement("span");
     r.className = "hrank";
     r.style.color = color;
@@ -615,11 +588,11 @@ function showToast(g) {
   toastEl.innerHTML = "";
   const word = document.createElement("span");
   word.className = "t-word";
-  word.textContent = (g.hint ? "💡 " : "") + g.word;
+  word.textContent = g.word;
   const rank = document.createElement("span");
   rank.className = "t-rank";
   rank.style.color = color;
-  rank.textContent = `${fmt(g.rank)} ${rankEmoji(g.rank)}`;
+  rank.textContent = fmt(g.rank);
   toastEl.append(word, rank);
   toastEl.style.borderColor = color;
   toastEl.classList.remove("hidden", "show");

@@ -6,8 +6,8 @@
     <title>Wordo — Daily semantic word game (Danish & English)</title>
     <meta name="description" content="Guess the secret word by meaning, not spelling. Each guess is ranked by how close it is. A free daily word game in Danish and English — fewer guesses wins." />
     <link rel="canonical" href="https://wordo.sahari.io/" />
-    <link rel="icon" href="favicon.svg?v=21" type="image/svg+xml" />
-    <meta name="theme-color" content="#0b0d11" />
+    <link rel="icon" href="favicon.svg?v=22" type="image/svg+xml" />
+    <meta name="theme-color" content="#f1ede3" />
 
     <!-- Social share preview (Open Graph / Twitter) -->
     <meta property="og:type" content="website" />
@@ -44,18 +44,18 @@
       rel="stylesheet"
     />
     <script defer src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
-    <link rel="stylesheet" href="style.css?v=21" />
+    <link rel="stylesheet" href="style.css?v=22" />
   </head>
   <body>
     <div id="app">
       <!-- Start screen -->
       <section id="join" class="screen">
         <h1 class="logo">Word<span class="o-dot">o</span></h1>
-        <p class="tagline">Guess the secret word. Fewer guesses is better.</p>
+        <div class="rule"></div>
         <form id="join-form" class="card">
           <div class="mode-tabs" id="mode-tabs">
-            <button type="button" class="mode-tab" data-mode="daily">🗓️ Daily</button>
-            <button type="button" class="mode-tab active" data-mode="solo">🎮 Solo</button>
+            <button type="button" class="mode-tab" data-mode="daily">Daily</button>
+            <button type="button" class="mode-tab active" data-mode="solo">Solo</button>
           </div>
           <p id="mode-note" class="mode-note">Unlimited practice with a random word. Pick a difficulty.</p>
           <div class="lang-field">
@@ -82,9 +82,9 @@
         <header class="game-header">
           <button type="button" id="home-logo" class="logo small" title="Back to menu">Word<span class="o-dot">o</span></button>
           <span class="round-badge">Round <strong id="round-num">1</strong></span>
-          <span class="daily-badge hidden" id="daily-badge">🗓️ Daily</span>
+          <span class="daily-badge hidden" id="daily-badge">Daily</span>
           <span class="count-badge">Guesses <strong id="guess-count">0</strong></span>
-          <button id="sound-btn" class="ghost icon-btn" title="Sound on/off">🔊</button>
+          <button id="sound-btn" class="ghost icon-btn" title="Sound on/off" aria-label="Sound on/off"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 5 6 9H2v6h4l5 4z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M19 5a9 9 0 0 1 0 14"/></svg></button>
           <button id="leave-btn" class="ghost">Menu</button>
         </header>
 
@@ -100,14 +100,14 @@
             <p id="guess-msg" class="guess-msg"></p>
 
             <div class="action-row">
-              <button id="hint-btn" class="ghost hint-btn hidden">💡 Get a hint</button>
+              <button id="hint-btn" class="ghost hint-btn hidden">Get a hint</button>
               <button id="giveup-btn" class="ghost giveup-btn hidden">Give up</button>
             </div>
             <button id="new-round" class="ghost full hidden">New game</button>
             <div id="daily-result" class="daily-result hidden">
               <div id="daily-streak" class="daily-streak"></div>
-              <button type="button" id="share-btn" class="primary full">🔗 Share result</button>
-              <button type="button" id="play-solo-btn" class="ghost full">🎮 Play Solo instead</button>
+              <button type="button" id="share-btn" class="primary full">Share result</button>
+              <button type="button" id="play-solo-btn" class="ghost full">Play Solo instead</button>
               <p class="daily-come-back">Come back tomorrow for a new daily word.</p>
             </div>
             <ul id="guesses" class="guesses"></ul>
@@ -121,8 +121,6 @@
           <aside id="stats">
             <h2>Your stats</h2>
             <div id="stats-summary" class="stats-summary"></div>
-            <div class="stats-chart-title">Recent games</div>
-            <div id="stats-chart" class="stats-chart"></div>
             <div class="stats-chart-title">Rank</div>
             <div id="rank-card" class="rank-card"></div>
           </aside>
@@ -153,6 +151,6 @@
         <div id="ach-grid" class="ach-grid"></div>
       </div>
     </div>
-    <script src="app.js?v=21" type="module"></script>
+    <script src="app.js?v=22" type="module"></script>
   </body>
 </html>
