@@ -1,10 +1,10 @@
 // Wordo — singleplayer, fully client-side. Scoring runs in the browser (engine.js);
 // no server, no network calls during play.
 
-import * as eng from "./engine.js?v=18";
-import * as sfx from "./sound.js?v=18";
-import * as stats from "./stats.js?v=18";
-import * as daily from "./daily.js?v=18";
+import * as eng from "./engine.js?v=21";
+import * as sfx from "./sound.js?v=21";
+import * as stats from "./stats.js?v=21";
+import * as daily from "./daily.js?v=21";
 
 const $ = (id) => document.getElementById(id);
 const fmt = (n) => n.toLocaleString("en-US");
@@ -261,6 +261,7 @@ function showWin(word, count) {
   $("guess-form").classList.add("hidden");
   $("hint-btn").classList.add("hidden");
   $("giveup-btn").classList.add("hidden");
+  celebrate();
   finishGame("won", count);
   if (isDailyGame) {
     const d = daily.recordDaily(lang, "won", count);
@@ -485,6 +486,20 @@ function esc(s) {
   return d.innerHTML;
 }
 
+// Celebrate a win: a quick stagger-bounce across the guess list (anime.js).
+// Purely additive — if anime is unavailable the rows just sit still.
+function celebrate() {
+  const anime = window.anime;
+  if (!anime) return;
+  anime({
+    targets: "#guesses .guess-row",
+    scale: [1, 1.05, 1],
+    delay: anime.stagger(35),
+    duration: 520,
+    easing: "easeOutQuad",
+  });
+}
+
 function updateCounts() {
   $("guess-count").textContent = guesses.length;
   $("history-title").textContent = guesses.length ? `Your guesses (${guesses.length})` : "Your guesses";
@@ -496,7 +511,8 @@ function warmth(rank) {
 }
 function rankColor(rank) {
   const t = warmth(rank);
-  return `hsl(${25 + t * 195}, ${70 - t * 35}%, ${58 - t * 18}%)`;
+  // tuned for contrast on the light/paper background
+  return `hsl(${25 + t * 195}, ${82 - t * 27}%, ${47 - t * 3}%)`;
 }
 function rankEmoji(rank) {
   if (rank === 1) return "🎉";
@@ -532,14 +548,19 @@ function renderGuesses(newest) {
   }
 
   const row = rowEls.get(newest.word);
-  row.classList.add("enter");
   const bar = row.querySelector(".bar");
   const target = bar.style.width;
   bar.style.width = "0%";
   requestAnimationFrame(() => {
-    row.classList.remove("enter");
     bar.style.width = target;
   });
+  // Springy pop for the new row (scale only, so it stays visible even if anime can't run).
+  if (window.anime) {
+    window.anime({ targets: row, scale: [0.86, 1], duration: 480, easing: "easeOutElastic(1, 0.7)" });
+  } else {
+    row.classList.add("enter");
+    requestAnimationFrame(() => row.classList.remove("enter"));
+  }
 }
 
 function rowFor(g) {
